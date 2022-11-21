@@ -7,17 +7,23 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
 } from "reactflow";
-import type { Connection } from "reactflow";
+import type { Connection, Node } from "reactflow";
 // 👇 you need to import the reactflow styles
 import "reactflow/dist/style.css";
 import BotSender from "./nodes/BotSender/BotSender";
 
-const initialNodes = [
+const initialNodes: Node[] = [
   { id: "1", position: { x: 100, y: 10 }, data: { label: "1" } },
   {
     id: "2",
     position: { x: 300, y: 200 },
-    data: { label: "2" },
+    data: {
+      label: "Цепочка сообщений",
+      outputs: [
+        { id: "1", type: "text", value: "Тестовое сообщение 1" },
+        { id: "2", type: "text", value: "Тестовое сообщение 2" },
+      ],
+    },
     type: "bot-sender",
     // dragHandle: ".custom-drag-handle",
   },

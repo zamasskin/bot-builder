@@ -31,10 +31,10 @@ import {
   Input,
   Center,
 } from "@chakra-ui/react";
-import { Handle, Position } from "reactflow";
+import { Handle, Position, useReactFlow, useStoreApi } from "reactflow";
 import { DndContext } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { memo, useState } from "react";
+import { ChangeEventHandler, memo, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 
 // Icons
@@ -88,7 +88,45 @@ function HandleItem(props: HandleItemProps) {
   );
 }
 
-function BotSender() {
+function Output(props: OutputProps & { nodeId: string }) {
+  const { nodeId, ...nodeProps } = props;
+  const { setNodes } = useReactFlow();
+  const store = useStoreApi();
+
+  const onChange = (props: OutputProps) => {
+    const { nodeInternals } = store.getState();
+    const oldNode = Array.from(nodeInternals.values()).find(
+      (val) => val.id === nodeId
+    );
+
+    let outputs: OutputProps[] = oldNode?.data?.outputs || [];
+    outputs = outputs.map((output) =>
+      output.id === props.id ? props : output
+    );
+
+    setNodes(
+      Array.from(nodeInternals.values()).map((node) => {
+        if (node.id === nodeId) {
+          node.data = { ...node.data, outputs };
+        }
+        return node;
+      })
+    );
+  };
+
+  if (props.type === "text") {
+    return (
+      <Textarea
+        onChange={(ev) => onChange({ ...nodeProps, value: ev.target.value })}
+        value={props.value}
+      />
+    );
+  }
+
+  return <div>test</div>;
+}
+
+function BotSender({ id, data }: BotSenderProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -100,7 +138,7 @@ function BotSender() {
           borderTopRadius="xl"
           className="custom-drag-handle"
         >
-          <Heading size="sm">Цепочка сообщений</Heading>
+          <Heading size="sm">{data.label}</Heading>
         </CardHeader>
         <VStack spacing="2" my="2">
           <HandleItem
@@ -141,6 +179,11 @@ function BotSender() {
                 <Heading as="div" size="sm">
                   Цепочка сообщений
                 </Heading>
+                {data.outputs &&
+                  data.outputs.map((output) => (
+                    <Output key={output.id} nodeId={id} {...output} />
+                  ))}
+
                 <HStack spacing="2">
                   <Divider />
                   <Badge padding="2" borderRadius="full">
@@ -217,6 +260,24 @@ interface HandleItemProps {
   color?: string;
   bg: string;
   id: string;
+}
+
+interface BotSenderProps {
+  id: string;
+  data: BotSenderPropsData;
+}
+
+interface BotSenderPropsData {
+  label: string;
+  outputs: OutputProps[];
+}
+
+type OutputProps = OutputDefault;
+
+interface OutputDefault {
+  id: string;
+  type: string;
+  value: string;
 }
 
 export default memo(BotSender);
