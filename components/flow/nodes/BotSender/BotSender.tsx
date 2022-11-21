@@ -37,6 +37,8 @@ import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { ChangeEventHandler, memo, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 
+import EmojiPicker from "emoji-picker-react";
+
 // Icons
 import {
   FaPlus,
@@ -46,6 +48,7 @@ import {
   FaRegFileAudio,
   FaRegFile,
   FaRegFileWord,
+  FaHourglassHalf,
 } from "react-icons/fa";
 
 function AddItemBtn({
@@ -128,6 +131,27 @@ function Output(props: OutputProps & { nodeId: string }) {
 
 function BotSender({ id, data }: BotSenderProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { setNodes } = useReactFlow();
+  const store = useStoreApi();
+
+  const onRemoveItem = ({ outputId }: { outputId: string }) => {
+    const { nodeInternals } = store.getState();
+    const oldNode = Array.from(nodeInternals.values()).find(
+      (val) => val.id === id
+    );
+
+    let outputs: OutputProps[] = Array.from(oldNode?.data?.outputs || []);
+    outputs = outputs.filter((output: OutputProps) => output.id !== outputId);
+
+    setNodes(
+      Array.from(nodeInternals.values()).map((node) => {
+        if (node.id === id) {
+          node.data = { ...node.data, outputs };
+        }
+        return node;
+      })
+    );
+  };
 
   return (
     <Box>
@@ -181,7 +205,15 @@ function BotSender({ id, data }: BotSenderProps) {
                 </Heading>
                 {data.outputs &&
                   data.outputs.map((output) => (
-                    <Output key={output.id} nodeId={id} {...output} />
+                    <Box
+                      key={output.id}
+                      mx="2"
+                      padding="2"
+                      boxShadow="xs"
+                      borderRadius="md"
+                    >
+                      <Output nodeId={id} {...output} />
+                    </Box>
                   ))}
 
                 <HStack spacing="2">
@@ -201,6 +233,7 @@ function BotSender({ id, data }: BotSenderProps) {
                   <AddItemBtn icon={<FaRegFileWord />}>
                     Документ из CRM
                   </AddItemBtn>
+                  <AddItemBtn icon={<FaHourglassHalf />}>Таймаут</AddItemBtn>
                 </AddItemBtnWrap>
               </VStack>
               <Divider />
