@@ -15,6 +15,12 @@ import {
   Box,
   Divider,
   VStack,
+  Flex,
+  IconButton,
+  Badge,
+  HStack,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import { Handle, Position } from "reactflow";
 import { DndContext } from "@dnd-kit/core";
@@ -23,7 +29,15 @@ import { memo, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 
 // Icons
-import { BsChat } from "react-icons/bs";
+import {
+  FaPlus,
+  FaRegComment,
+  FaRegFileImage,
+  FaVideo,
+  FaRegFileAudio,
+  FaRegFile,
+  FaRegFileWord,
+} from "react-icons/fa";
 
 function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -38,6 +52,34 @@ function SortableItem(props: any) {
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div>hello</div>
     </div>
+  );
+}
+
+function AddItemBtn({
+  icon,
+  children,
+}: {
+  icon: React.ReactElement;
+  children: React.ReactElement | string;
+}) {
+  return (
+    <WrapItem>
+      <Button size="sm" colorScheme="blue" leftIcon={icon}>
+        {children}
+      </Button>
+    </WrapItem>
+  );
+}
+
+function AddItemBtnWrap({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[];
+}) {
+  return (
+    <Wrap spacing="2" mt="2">
+      {children}
+    </Wrap>
   );
 }
 
@@ -121,13 +163,42 @@ function BotSender() {
           </Box>
         </VStack>
       </Card>
-      <Drawer isOpen={isOpen} onClose={onClose} placement="right">
+      <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="md">
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px">Basic Drawer</DrawerHeader>
           <DrawerBody>
-            <Text>Some contents...</Text>
-            <Text>Some contents...</Text>
+            <VStack spacing="2">
+              <Box w="full">
+                <Heading as="div" size="sm">
+                  Цепочка сообщений
+                </Heading>
+                <Flex align="center">
+                  <Divider />
+                  <Badge padding="2" borderRadius="full">
+                    <FaPlus />
+                  </Badge>
+                  <Divider />
+                </Flex>
+                <AddItemBtnWrap>
+                  <AddItemBtn icon={<FaRegComment />}>Текст</AddItemBtn>
+                  <AddItemBtn icon={<FaRegFileImage />}>Фото</AddItemBtn>
+                  <AddItemBtn icon={<FaVideo />}>Видео</AddItemBtn>
+                  <AddItemBtn icon={<FaVideo />}>Видеосообщение</AddItemBtn>
+                  <AddItemBtn icon={<FaRegFileAudio />}>Аудио</AddItemBtn>
+                  <AddItemBtn icon={<FaRegFile />}>Файл</AddItemBtn>
+                  <AddItemBtn icon={<FaRegFileWord />}>
+                    Документ из CRM
+                  </AddItemBtn>
+                </AddItemBtnWrap>
+              </Box>
+              <Divider />
+              <Box w="full">
+                <Text>Some contents...</Text>
+                <Text>Some contents...</Text>
+              </Box>
+            </VStack>
+
             <Text>Some contents...</Text>
           </DrawerBody>
         </DrawerContent>
