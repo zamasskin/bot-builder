@@ -1,8 +1,6 @@
 import {
   Card,
-  CardBody,
   CardHeader,
-  CardFooter,
   Heading,
   Button,
   Text,
@@ -16,7 +14,6 @@ import {
   Divider,
   VStack,
   Flex,
-  IconButton,
   Badge,
   HStack,
   Wrap,
