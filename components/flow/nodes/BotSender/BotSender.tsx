@@ -129,13 +129,13 @@ function BotSender() {
                 <Heading as="div" size="sm">
                   Цепочка сообщений
                 </Heading>
-                <Flex align="center">
+                <HStack spacing="2">
                   <Divider />
                   <Badge padding="2" borderRadius="full">
                     <FaPlus />
                   </Badge>
                   <Divider />
-                </Flex>
+                </HStack>
                 <AddItemBtnWrap>
                   <AddItemBtn icon={<FaRegComment />}>Текст</AddItemBtn>
                   <AddItemBtn icon={<FaRegFileImage />}>Фото</AddItemBtn>
