@@ -16,7 +16,7 @@ const initialNodes = [
   { id: "1", position: { x: 100, y: 10 }, data: { label: "1" } },
   {
     id: "2",
-    position: { x: 200, y: 100 },
+    position: { x: 300, y: 200 },
     data: { label: "2" },
     type: "bot-sender",
     // dragHandle: ".custom-drag-handle",
