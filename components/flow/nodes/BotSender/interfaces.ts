@@ -22,3 +22,8 @@ export interface OutputDefault {
   type: string;
   value: string;
 }
+
+export interface ControlProps extends BotSenderProps {
+  onClose(): void;
+  isOpen: boolean;
+}
