@@ -28,13 +28,19 @@ const initialNodes: Node[] = [
     // dragHandle: ".custom-drag-handle",
   },
 
-  // { id: "3", position: { x: 100, y: 300 }, data: { label: "2" } },
+  { id: "3", position: { x: 300, y: 10 }, data: { label: "2" } },
 ];
 
 const initialEdges = [
   {
     id: "e1-2",
     source: "1",
+    target: "2",
+  },
+
+  {
+    id: "e1-3",
+    source: "3",
     target: "2",
   },
 ];
