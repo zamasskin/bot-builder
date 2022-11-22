@@ -1,5 +1,4 @@
 import { v4 as uuidV4 } from "uuid";
-import { MouseEventHandler } from "react";
 import { useReactFlow, useStoreApi } from "reactflow";
 import EmojiPicker from "emoji-picker-react";
 import {
@@ -32,74 +31,68 @@ import {
   FaHourglassHalf,
 } from "react-icons/fa";
 
-import type { BotSenderProps, OutputProps } from "./interfaces";
+import type {
+  BotSenderProps,
+  OutputControlAll,
+  OutputDefault,
+  OutputProps,
+  TextOutputControlProps,
+  OutputConf,
+  OutputItemConf,
+} from "./interfaces";
 
-function AddItemBtn({
-  icon,
-  caption,
-  onClick,
-}: {
-  icon: React.ReactElement;
-  caption: string;
-  onClick?: MouseEventHandler | undefined;
-}) {
+const outputs: { [key: string]: OutputItemConf } = {
+  text: {
+    caption: "Текстовое сообщение",
+    icon: <FaRegComment />,
+    control: (props: TextOutputControlProps) => <TextOutput {...props} />,
+  },
+  photo: {
+    caption: "Фото",
+    icon: <FaRegFileImage />,
+    control: (props: any) => <div>Фото</div>,
+  },
+  video: {
+    caption: "Видео",
+    icon: <FaVideo />,
+    control: (props: any) => <div>Видео</div>,
+  },
+  videoMessage: {
+    caption: "Видео-сообщение",
+    icon: <FaVideo />,
+    control: (props: any) => <div>Видео-сообщение</div>,
+  },
+  audio: {
+    caption: "Аудио",
+    icon: <FaRegFileAudio />,
+    control: (props: any) => <div>Аудио</div>,
+  },
+  file: {
+    caption: "Файл",
+    icon: <FaRegFile />,
+    control: (props: any) => <div>Файл</div>,
+  },
+  document: {
+    caption: "Документ из CRM",
+    icon: <FaRegFileWord />,
+    control: (props: any) => <div>Документ из CRM</div>,
+  },
+  timeout: {
+    caption: "Таймаут",
+    icon: <FaHourglassHalf />,
+    control: (props: any) => <div>Таймаут</div>,
+  },
+};
+
+function TextOutput({ onChange, output }: TextOutputControlProps) {
   return (
-    <WrapItem>
-      <Button size="sm" colorScheme="blue" leftIcon={icon} onClick={onClick}>
-        {caption}
-      </Button>
-    </WrapItem>
+    <Textarea
+      value={output.value}
+      onChange={(ev) =>
+        onChange && onChange({ ...output, value: ev.target.value })
+      }
+    />
   );
-}
-
-function AddItemBtnWrap({
-  children,
-}: {
-  children: React.ReactElement | React.ReactElement[];
-}) {
-  return (
-    <Wrap spacing="2" mt="2">
-      {children}
-    </Wrap>
-  );
-}
-
-function Output(props: OutputProps & { nodeId: string }) {
-  const { nodeId, ...nodeProps } = props;
-  const { setNodes } = useReactFlow();
-  const store = useStoreApi();
-
-  const onChange = (props: OutputProps) => {
-    const { nodeInternals } = store.getState();
-    const oldNode = Array.from(nodeInternals.values()).find(
-      (val) => val.id === nodeId
-    );
-
-    let outputs: OutputProps[] = oldNode?.data?.outputs || [];
-    outputs = outputs.map((output) =>
-      output.id === props.id ? props : output
-    );
-
-    setNodes(
-      Array.from(nodeInternals.values()).map((node) => {
-        if (node.id === nodeId) {
-          node.data = { ...node.data, outputs };
-        }
-        return node;
-      })
-    );
-  };
-
-  if (props.type === "text") {
-    return (
-      <Textarea
-        onChange={(ev) => onChange({ ...nodeProps, value: ev.target.value })}
-        value={props.value}
-      />
-    );
-  }
-
-  return <div>test</div>;
 }
 
 export default function OutputsControl({ id, data }: BotSenderProps) {
@@ -150,6 +143,27 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
     );
   };
 
+  const onChange = (props: OutputProps) => {
+    const { nodeInternals } = store.getState();
+    const oldNode = Array.from(nodeInternals.values()).find(
+      (val) => val.id === id
+    );
+
+    let outputs: OutputProps[] = oldNode?.data?.outputs || [];
+    outputs = outputs.map((output) =>
+      output.id === props.id ? props : output
+    );
+
+    setNodes(
+      Array.from(nodeInternals.values()).map((node) => {
+        if (node.id === id) {
+          node.data = { ...node.data, outputs };
+        }
+        return node;
+      })
+    );
+  };
+
   const caption: { [key: string]: string } = {
     text: "Текстовое сообщение",
     photo: "Фото",
@@ -186,7 +200,7 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
                 </Flex>
               </CardHeader>
               <CardBody padding="2">
-                <Output nodeId={id} {...output} />
+                {outputs[output.type].control({ output, id, onChange })}
               </CardBody>
             </Card>
           </Box>
@@ -198,54 +212,20 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
         </Badge>
         <Divider />
       </HStack>
-      <AddItemBtnWrap>
-        <AddItemBtn
-          icon={<FaRegComment />}
-          onClick={() => addOutput("text")}
-          caption={caption["text"]}
-        />
-
-        <AddItemBtn
-          icon={<FaRegFileImage />}
-          onClick={() => addOutput("photo")}
-          caption={caption["photo"]}
-        />
-
-        <AddItemBtn
-          icon={<FaVideo />}
-          onClick={() => addOutput("video")}
-          caption={caption["video"]}
-        />
-
-        <AddItemBtn
-          icon={<FaVideo />}
-          onClick={() => addOutput("videoMessage")}
-          caption={caption["videoMessage"]}
-        />
-        <AddItemBtn
-          icon={<FaRegFileAudio />}
-          onClick={() => addOutput("audio")}
-          caption={caption["audio"]}
-        />
-
-        <AddItemBtn
-          icon={<FaRegFile />}
-          onClick={() => addOutput("file")}
-          caption={caption["file"]}
-        />
-
-        <AddItemBtn
-          icon={<FaRegFileWord />}
-          onClick={() => addOutput("document")}
-          caption={caption["document"]}
-        />
-
-        <AddItemBtn
-          icon={<FaHourglassHalf />}
-          onClick={() => addOutput("timeout")}
-          caption={caption["timeout"]}
-        />
-      </AddItemBtnWrap>
+      <Wrap spacing="2" mt="2">
+        {Object.keys(outputs).map((type) => (
+          <WrapItem key={type}>
+            <Button
+              size="sm"
+              colorScheme="blue"
+              leftIcon={outputs[type].icon}
+              onClick={() => addOutput(type)}
+            >
+              {outputs[type].caption}
+            </Button>
+          </WrapItem>
+        ))}
+      </Wrap>
     </VStack>
   );
 }

@@ -27,3 +27,18 @@ export interface ControlProps extends BotSenderProps {
   onClose(): void;
   isOpen: boolean;
 }
+
+export interface TextOutputControlProps {
+  output: OutputDefault;
+  id: string;
+  onChange?(props: OutputProps): void;
+}
+
+export type OutputControlAll = TextOutputControlProps;
+
+export type OutputConf = { [key: string]: OutputItemConf };
+export interface OutputItemConf {
+  caption: string;
+  icon: React.ReactElement;
+  control(props: OutputControlAll): JSX.Element;
+}
