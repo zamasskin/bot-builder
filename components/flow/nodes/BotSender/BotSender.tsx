@@ -51,6 +51,7 @@ import {
   FaHourglassHalf,
   FaWindowClose,
 } from "react-icons/fa";
+import { BotSenderProps, HandleItemProps, OutputProps } from "./interfaces";
 
 function AddItemBtn({
   icon,
@@ -324,31 +325,6 @@ function BotSender({ id, data }: BotSenderProps) {
       </Drawer>
     </Box>
   );
-}
-
-interface HandleItemProps {
-  caption: string;
-  color?: string;
-  bg: string;
-  id: string;
-}
-
-interface BotSenderProps {
-  id: string;
-  data: BotSenderPropsData;
-}
-
-interface BotSenderPropsData {
-  label: string;
-  outputs: OutputProps[];
-}
-
-type OutputProps = OutputDefault;
-
-interface OutputDefault {
-  id: string;
-  type: string;
-  value: string;
 }
 
 export default memo(BotSender);
