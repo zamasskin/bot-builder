@@ -27,12 +27,15 @@ import {
   InputLeftAddon,
   Input,
   Center,
+  IconButton,
+  CloseButton,
 } from "@chakra-ui/react";
 import { Handle, Position, useReactFlow, useStoreApi } from "reactflow";
 import { DndContext } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { ChangeEventHandler, memo, useState } from "react";
+import { ChangeEventHandler, memo, MouseEventHandler, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
+import { v4 as uuidV4 } from "uuid";
 
 import EmojiPicker from "emoji-picker-react";
 
@@ -46,18 +49,21 @@ import {
   FaRegFile,
   FaRegFileWord,
   FaHourglassHalf,
+  FaWindowClose,
 } from "react-icons/fa";
 
 function AddItemBtn({
   icon,
   children,
+  onClick,
 }: {
   icon: React.ReactElement;
   children: React.ReactElement | string;
+  onClick?: MouseEventHandler | undefined;
 }) {
   return (
     <WrapItem>
-      <Button size="sm" colorScheme="blue" leftIcon={icon}>
+      <Button size="sm" colorScheme="blue" leftIcon={icon} onClick={onClick}>
         {children}
       </Button>
     </WrapItem>
@@ -131,7 +137,7 @@ function BotSender({ id, data }: BotSenderProps) {
   const { setNodes } = useReactFlow();
   const store = useStoreApi();
 
-  const onRemoveItem = ({ outputId }: { outputId: string }) => {
+  const removeOutput = (outputId: string) => {
     const { nodeInternals } = store.getState();
     const oldNode = Array.from(nodeInternals.values()).find(
       (val) => val.id === id
@@ -139,6 +145,31 @@ function BotSender({ id, data }: BotSenderProps) {
 
     let outputs: OutputProps[] = Array.from(oldNode?.data?.outputs || []);
     outputs = outputs.filter((output: OutputProps) => output.id !== outputId);
+
+    setNodes(
+      Array.from(nodeInternals.values()).map((node) => {
+        if (node.id === id) {
+          node.data = { ...node.data, outputs };
+        }
+        return node;
+      })
+    );
+  };
+
+  const addOutput = (type: string) => {
+    const { nodeInternals } = store.getState();
+    const oldNode = Array.from(nodeInternals.values()).find(
+      (val) => val.id === id
+    );
+
+    let outputs: OutputProps[] = Array.from(oldNode?.data?.outputs || []);
+
+    let output: OutputProps = { id: uuidV4(), type } as OutputProps;
+    if (type === "text") {
+      output = { ...output, value: "" };
+    }
+
+    outputs.push(output);
 
     setNodes(
       Array.from(nodeInternals.values()).map((node) => {
@@ -205,10 +236,15 @@ function BotSender({ id, data }: BotSenderProps) {
                     <Box
                       key={output.id}
                       mx="2"
-                      padding="2"
-                      boxShadow="xs"
+                      // boxShadow="xs"
                       borderRadius="md"
                     >
+                      <CloseButton
+                        bg="red.300"
+                        color="white"
+                        size="sm"
+                        onClick={() => removeOutput(output.id)}
+                      />
                       <Output nodeId={id} {...output} />
                     </Box>
                   ))}
@@ -221,7 +257,12 @@ function BotSender({ id, data }: BotSenderProps) {
                   <Divider />
                 </HStack>
                 <AddItemBtnWrap>
-                  <AddItemBtn icon={<FaRegComment />}>Текст</AddItemBtn>
+                  <AddItemBtn
+                    icon={<FaRegComment />}
+                    onClick={() => addOutput("text")}
+                  >
+                    Текст
+                  </AddItemBtn>
                   <AddItemBtn icon={<FaRegFileImage />}>Фото</AddItemBtn>
                   <AddItemBtn icon={<FaVideo />}>Видео</AddItemBtn>
                   <AddItemBtn icon={<FaVideo />}>Видеосообщение</AddItemBtn>
