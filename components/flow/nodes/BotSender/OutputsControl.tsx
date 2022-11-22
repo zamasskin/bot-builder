@@ -1,6 +1,5 @@
 import { v4 as uuidV4 } from "uuid";
 import { useReactFlow, useStoreApi } from "reactflow";
-import EmojiPicker from "emoji-picker-react";
 import {
   Box,
   Button,
@@ -33,13 +32,11 @@ import {
 
 import type {
   BotSenderProps,
-  OutputControlAll,
-  OutputDefault,
   OutputProps,
   TextOutputControlProps,
-  OutputConf,
   OutputItemConf,
 } from "./interfaces";
+import BBCodeEditor from "../../../editors/BBCodeEditor";
 
 const outputs: { [key: string]: OutputItemConf } = {
   text: {
@@ -86,11 +83,9 @@ const outputs: { [key: string]: OutputItemConf } = {
 
 function TextOutput({ onChange, output }: TextOutputControlProps) {
   return (
-    <Textarea
+    <BBCodeEditor
       value={output.value}
-      onChange={(ev) =>
-        onChange && onChange({ ...output, value: ev.target.value })
-      }
+      onChange={(value) => onChange && onChange({ ...output, value })}
     />
   );
 }
@@ -144,6 +139,7 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
   };
 
   const onChange = (props: OutputProps) => {
+    console.log(1);
     const { nodeInternals } = store.getState();
     const oldNode = Array.from(nodeInternals.values()).find(
       (val) => val.id === id
