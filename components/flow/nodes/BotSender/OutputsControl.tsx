@@ -14,6 +14,10 @@ import {
   HStack,
   Divider,
   Badge,
+  Card,
+  CardHeader,
+  CardBody,
+  Flex,
 } from "@chakra-ui/react";
 
 // Icons
@@ -32,17 +36,17 @@ import type { BotSenderProps, OutputProps } from "./interfaces";
 
 function AddItemBtn({
   icon,
-  children,
+  caption,
   onClick,
 }: {
   icon: React.ReactElement;
-  children: React.ReactElement | string;
+  caption: string;
   onClick?: MouseEventHandler | undefined;
 }) {
   return (
     <WrapItem>
       <Button size="sm" colorScheme="blue" leftIcon={icon} onClick={onClick}>
-        {children}
+        {caption}
       </Button>
     </WrapItem>
   );
@@ -146,6 +150,17 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
     );
   };
 
+  const caption: { [key: string]: string } = {
+    text: "Текстовое сообщение",
+    photo: "Фото",
+    video: "Видео",
+    videoMessage: "Видео-сообщение",
+    audio: "Аудио",
+    file: "Файл",
+    document: "Документ из CRM",
+    timeout: "Таймаут",
+  };
+
   return (
     <VStack spacing="2" w="full" align="left">
       <Heading as="div" size="sm">
@@ -153,19 +168,27 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
       </Heading>
       {data.outputs &&
         data.outputs.map((output) => (
-          <Box
-            key={output.id}
-            mx="2"
-            // boxShadow="xs"
-            borderRadius="md"
-          >
-            <CloseButton
-              bg="red.300"
-              color="white"
-              size="sm"
-              onClick={() => removeOutput(output.id)}
-            />
-            <Output nodeId={id} {...output} />
+          <Box key={output.id}>
+            <Card>
+              <CardHeader padding="3">
+                <Flex>
+                  <Flex flex="1">
+                    <Heading as="h3" size="xs">
+                      {caption[output.type]}
+                    </Heading>
+                  </Flex>
+                  <CloseButton
+                    bg="red.300"
+                    color="white"
+                    size="sm"
+                    onClick={() => removeOutput(output.id)}
+                  />
+                </Flex>
+              </CardHeader>
+              <CardBody padding="2">
+                <Output nodeId={id} {...output} />
+              </CardBody>
+            </Card>
           </Box>
         ))}
       <HStack spacing="2">
@@ -176,16 +199,52 @@ export default function OutputsControl({ id, data }: BotSenderProps) {
         <Divider />
       </HStack>
       <AddItemBtnWrap>
-        <AddItemBtn icon={<FaRegComment />} onClick={() => addOutput("text")}>
-          Текст
-        </AddItemBtn>
-        <AddItemBtn icon={<FaRegFileImage />}>Фото</AddItemBtn>
-        <AddItemBtn icon={<FaVideo />}>Видео</AddItemBtn>
-        <AddItemBtn icon={<FaVideo />}>Видео-сообщение</AddItemBtn>
-        <AddItemBtn icon={<FaRegFileAudio />}>Аудио</AddItemBtn>
-        <AddItemBtn icon={<FaRegFile />}>Файл</AddItemBtn>
-        <AddItemBtn icon={<FaRegFileWord />}>Документ из CRM</AddItemBtn>
-        <AddItemBtn icon={<FaHourglassHalf />}>Таймаут</AddItemBtn>
+        <AddItemBtn
+          icon={<FaRegComment />}
+          onClick={() => addOutput("text")}
+          caption={caption["text"]}
+        />
+
+        <AddItemBtn
+          icon={<FaRegFileImage />}
+          onClick={() => addOutput("photo")}
+          caption={caption["photo"]}
+        />
+
+        <AddItemBtn
+          icon={<FaVideo />}
+          onClick={() => addOutput("video")}
+          caption={caption["video"]}
+        />
+
+        <AddItemBtn
+          icon={<FaVideo />}
+          onClick={() => addOutput("videoMessage")}
+          caption={caption["videoMessage"]}
+        />
+        <AddItemBtn
+          icon={<FaRegFileAudio />}
+          onClick={() => addOutput("audio")}
+          caption={caption["audio"]}
+        />
+
+        <AddItemBtn
+          icon={<FaRegFile />}
+          onClick={() => addOutput("file")}
+          caption={caption["file"]}
+        />
+
+        <AddItemBtn
+          icon={<FaRegFileWord />}
+          onClick={() => addOutput("document")}
+          caption={caption["document"]}
+        />
+
+        <AddItemBtn
+          icon={<FaHourglassHalf />}
+          onClick={() => addOutput("timeout")}
+          caption={caption["timeout"]}
+        />
       </AddItemBtnWrap>
     </VStack>
   );
